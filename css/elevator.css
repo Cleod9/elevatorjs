@@ -1,0 +1,67 @@
+body, html {
+	height: 100%;
+}
+div.container {
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+#viewport {
+	width: 80%;
+	padding: 10px;
+	display: table-cell;
+}
+table.floor-view {
+	border: 1px solid #CCCCCC;
+	border-collapse: collapse;
+}
+table.floor-view td, table.floor-view th {
+	border: 1px solid #CCCCCC;
+}
+table.floor-view .title{
+	white-space: nowrap;
+	width: 10%;
+	font-size: 12px;
+}
+table.floor-view .data{
+	width: 90%;
+	font-size: 12px;
+}
+table.elevator-view {
+	width: 100%;
+	height: 100%;
+}
+table.elevator-view tr td {
+	font-size: 11px;
+	font-family: Courier New;
+}
+div.elevator {
+	position: absolute;
+	bottom: 0px;
+	background: #ffffff;
+	border: 1px solid black;
+	padding-left: 10px;
+	padding-right: 10px;
+	padding-bottom: 10px;
+}
+
+
+#sidebar {
+	font-size: 12px;
+	padding: 5px;
+	vertical-align: top;
+	display: table-cell;
+	min-width: 10px;
+	border-right: 1px solid #AAAAAA;
+	height: 100%;
+	background: #ffffff;
+}
+#sidebar.hide div.info-panel{
+	/*display: none;*/
+}
+div.info-panel {
+	width: 100%;
+	height: 100%;
+	width: 150px;
+	height: 100%;
+}

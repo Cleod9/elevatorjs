@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <meta name="description" content="A short description" />
+        <meta name="keywords" content="keyword1, keyword2, keyword 3" />
+        <title>Elevator Engine</title>
+        <link rel="icon" type="image/png" href="favicon.png" />
+        <link rel="stylesheet" type="text/css" href="css/elevator.css" />
+        <script type="text/javascript" src="lib/import.min.js"></script>
+        <script type="text/javascript" src="initialize.js"></script>
+        <!--[if lt IE 9]>
+        <script type="text/javascript">
+        document.createElement("nav");
+        document.createElement("header");
+        document.createElement("footer");
+        document.createElement("section");
+        document.createElement("aside");
+        document.createElement("article");
+        </script>
+        <![endif]-->
+    </head>
+    <body onload="initialize();">
+        <div class="container">
+            <div id="sidebar">
+                <button class="btn-pause">Pause</button>
+                <h3>Building Info</h3>
+                <table class="floor-view">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <div id="viewport">
+                <table class="elevator-view">
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+</html>
+
+
+	

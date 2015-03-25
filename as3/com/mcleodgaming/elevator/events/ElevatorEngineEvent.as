@@ -1,0 +1,1 @@
+﻿package com.mcleodgaming.elevator.events{	public class ElevatorEngineEvent extends Event	{		public static var UPDATE:String = "elevatorEngineUpdate"; //Triggered each time the engine ticks its main loop				public function ElevatorEngineEvent(type:String, data:Object):void {			super(type, data);		}	}}

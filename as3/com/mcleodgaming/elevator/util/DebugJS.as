@@ -1,0 +1,1 @@
+﻿package com.mcleodgaming.elevator.util{	public class DebugJS {		public static function log():void {			console.log.apply(console, arguments);		}		public static function warn():void {			console.warn(console, arguments);		}	}}
