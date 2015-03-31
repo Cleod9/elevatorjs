@@ -1,6 +1,6 @@
 {
 	"name": "elevatorjs",
-	"version": "0.1.1",
+	"version": "0.1.2",
 	"author": "Greg McLeod <cleod9@gmail.com>",
 	"description": "Elevator simulator built to demonstrate AS3JS",
 	"repository": {
