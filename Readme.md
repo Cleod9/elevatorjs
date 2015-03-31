@@ -26,13 +26,11 @@ You can explore the source code to see how to initialize the individual Floors, 
 
 ## To Perform a Build ##
 
-With [Node.js](https://nodejs.org/) installed on your system, run `npm install` from within the project folder. Then execute this command:
+With [Node.js](https://nodejs.org/) installed on your system, run `npm install` from within the project folder to install its dependencies. Then `elevator.js` can be recompiled via the following this command:
 
-`node node_modules/as3js/bin/as3jsc -src ./as3 -o elevator.js`
+`node build`
 
 Open `elevator.htm` to view.
-
-(You can install as3js as global module to save time, just ensure that it's version 0.1.0)
 
 ----------
 
