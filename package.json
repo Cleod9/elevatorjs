@@ -1,6 +1,6 @@
 {
 	"name": "elevatorjs",
-	"version": "0.1.2",
+	"version": "0.1.3",
 	"author": "Greg McLeod <cleod9@gmail.com>",
 	"description": "Elevator simulator built to demonstrate AS3JS",
 	"repository": {
@@ -15,7 +15,7 @@
 		"oop"
 	],
 	"dependencies" : {
-		"as3js": "0.1.0"
+		"as3js": "0.2.0"
 	},
 	"license": "MIT"
 }

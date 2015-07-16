@@ -5,7 +5,8 @@ var as3js = new AS3JS();
 var sourceText = as3js.compile({
   srcPaths: ['./as3'],
   silent: false,
-  verbose: false
+  verbose: false,
+  entry: "new:com.mcleodgaming.elevator.Main"
 });
 if (fs.existsSync('elevator.js'))
 {
