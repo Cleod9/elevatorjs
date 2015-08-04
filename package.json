@@ -15,7 +15,7 @@
 		"oop"
 	],
 	"dependencies" : {
-		"as3js": "0.2.1"
+		"as3js": "0.2.3"
 	},
 	"license": "MIT"
 }

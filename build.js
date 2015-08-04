@@ -7,7 +7,7 @@ var sourceText = as3js.compile({
   silent: false,
   verbose: false,
   entry: "new:com.mcleodgaming.elevator.Main"
-});
+}).compiledSource;
 if (fs.existsSync('elevator.js'))
 {
   fs.unlinkSync('elevator.js');

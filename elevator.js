@@ -25,12 +25,9 @@
       Elevator: {
         compiled: false,
         source: function ( module ) {
-          var Main, ElevatorState, Floor, Person, PersonState, ElevatorEvent, EventDispatcher, Debug, FrameTimer;
+          var ElevatorState, PersonState, ElevatorEvent, EventDispatcher, Debug, FrameTimer;
           module.inject = function () {
-            Main = imports('com.mcleodgaming.elevator', 'Main');
             ElevatorState = imports('com.mcleodgaming.elevator.core', 'ElevatorState');
-            Floor = imports('com.mcleodgaming.elevator.core', 'Floor');
-            Person = imports('com.mcleodgaming.elevator.core', 'Person');
             PersonState = imports('com.mcleodgaming.elevator.core', 'PersonState');
             ElevatorEvent = imports('com.mcleodgaming.elevator.events', 'ElevatorEvent');
             EventDispatcher = imports('com.mcleodgaming.elevator.events', 'EventDispatcher');
@@ -173,10 +170,6 @@
       }, Floor: {
         compiled: false,
         source: function ( module ) {
-          var Person;
-          module.inject = function () {
-            Person = imports('com.mcleodgaming.elevator.core', 'Person');
-          };
           
           var Floor = function(params) {
                 this.people = null;      //Get settings      params = params || {};      this.index = (typeof params.index == "number") ? params.index : -1;      this.name = params.name || "[No Name]";      this.people = [];    };
@@ -197,10 +190,8 @@
       }, Person: {
         compiled: false,
         source: function ( module ) {
-          var Elevator, Floor, PersonState, EventDispatcher, PersonEvent, FrameTimer;
+          var PersonState, EventDispatcher, PersonEvent, FrameTimer;
           module.inject = function () {
-            Elevator = imports('com.mcleodgaming.elevator.core', 'Elevator');
-            Floor = imports('com.mcleodgaming.elevator.core', 'Floor');
             PersonState = imports('com.mcleodgaming.elevator.core', 'PersonState');
             EventDispatcher = imports('com.mcleodgaming.elevator.events', 'EventDispatcher');
             PersonEvent = imports('com.mcleodgaming.elevator.events', 'PersonEvent');
@@ -333,9 +324,8 @@
       }, EventDispatcher: {
         compiled: false,
         source: function ( module ) {
-          var Event, Debug;
+          var Debug;
           module.inject = function () {
-            Event = imports('com.mcleodgaming.elevator.events', 'Event');
             Debug = imports('com.mcleodgaming.elevator.util', 'Debug');
             EventDispatcher.debug = false;
             EventDispatcher.dispatcher = null;
@@ -400,12 +390,10 @@
       Main: {
         compiled: false,
         source: function ( module ) {
-          var Debug, ElevatorEngine, ElevatorView, ElevatorViewAS3, ElevatorViewJS, EventDispatcher;
+          var Debug, ElevatorEngine, ElevatorViewJS, EventDispatcher;
           module.inject = function () {
             Debug = imports('com.mcleodgaming.elevator.util', 'Debug');
             ElevatorEngine = imports('com.mcleodgaming.elevator.core', 'ElevatorEngine');
-            ElevatorView = imports('com.mcleodgaming.elevator.views', 'ElevatorView');
-            ElevatorViewAS3 = imports('com.mcleodgaming.elevator.views', 'ElevatorViewAS3');
             ElevatorViewJS = imports('com.mcleodgaming.elevator.views', 'ElevatorViewJS');
             EventDispatcher = imports('com.mcleodgaming.elevator.events', 'EventDispatcher');
             Main.ROOT = null;
@@ -501,9 +489,8 @@
       Debug: {
         compiled: false,
         source: function ( module ) {
-          var DebugAS3, DebugJS;
+          var DebugJS;
           module.inject = function () {
-            DebugAS3 = imports('com.mcleodgaming.elevator.util', 'DebugAS3');
             DebugJS = imports('com.mcleodgaming.elevator.util', 'DebugJS');
             Debug.log = null;
             Debug.warn = null;
@@ -606,13 +593,9 @@
       ElevatorView: {
         compiled: false,
         source: function ( module ) {
-          var Elevator, ElevatorEngine, ElevatorState, Floor, ElevatorEngineEvent;
+          var ElevatorState;
           module.inject = function () {
-            Elevator = imports('com.mcleodgaming.elevator.core', 'Elevator');
-            ElevatorEngine = imports('com.mcleodgaming.elevator.core', 'ElevatorEngine');
             ElevatorState = imports('com.mcleodgaming.elevator.core', 'ElevatorState');
-            Floor = imports('com.mcleodgaming.elevator.core', 'Floor');
-            ElevatorEngineEvent = imports('com.mcleodgaming.elevator.events', 'ElevatorEngineEvent');
           };
           
           var ElevatorView = function(e) {
@@ -648,14 +631,11 @@
         compiled: false,
         source: function ( module ) {
           var ElevatorView = imports('com.mcleodgaming.elevator.views', 'ElevatorView');
-          var Main, ElevatorEngineEvent, EventDispatcher, Elevator, ElevatorEngine, Floor, PersonState;
+          var Main, ElevatorEngineEvent, EventDispatcher, PersonState;
           module.inject = function () {
             Main = imports('com.mcleodgaming.elevator', 'Main');
             ElevatorEngineEvent = imports('com.mcleodgaming.elevator.events', 'ElevatorEngineEvent');
             EventDispatcher = imports('com.mcleodgaming.elevator.events', 'EventDispatcher');
-            Elevator = imports('com.mcleodgaming.elevator.core', 'Elevator');
-            ElevatorEngine = imports('com.mcleodgaming.elevator.core', 'ElevatorEngine');
-            Floor = imports('com.mcleodgaming.elevator.core', 'Floor');
             PersonState = imports('com.mcleodgaming.elevator.core', 'PersonState');
           };
           
@@ -685,12 +665,9 @@
         compiled: false,
         source: function ( module ) {
           var ElevatorView = imports('com.mcleodgaming.elevator.views', 'ElevatorView');
-          var Main, Elevator, ElevatorEngine, Floor, PersonState, ElevatorEngineEvent, EventDispatcher, Debug;
+          var Main, PersonState, ElevatorEngineEvent, EventDispatcher, Debug;
           module.inject = function () {
             Main = imports('com.mcleodgaming.elevator', 'Main');
-            Elevator = imports('com.mcleodgaming.elevator.core', 'Elevator');
-            ElevatorEngine = imports('com.mcleodgaming.elevator.core', 'ElevatorEngine');
-            Floor = imports('com.mcleodgaming.elevator.core', 'Floor');
             PersonState = imports('com.mcleodgaming.elevator.core', 'PersonState');
             ElevatorEngineEvent = imports('com.mcleodgaming.elevator.events', 'ElevatorEngineEvent');
             EventDispatcher = imports('com.mcleodgaming.elevator.events', 'EventDispatcher');
