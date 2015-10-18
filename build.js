@@ -1,8 +1,6 @@
 var fs = require('fs');
 var AS3JS = require('as3js');
 
-global.AS3JS = require('as3js/lib/as3');
-
 var as3js = new AS3JS();
 var sourceText = as3js.compile({
   srcPaths: ['./as3'],

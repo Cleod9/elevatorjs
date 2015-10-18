@@ -761,4 +761,4 @@
     
     
     module.exports = ElevatorViewJS;
-    };if(typeof module !== 'undefined'){module.exports=Program;}else if(typeof window!=='undefined'&&typeof AS3JS!=='undefined'){window['com.mcleodgaming.elevator.Main']=AS3JS.load({program:Program,entry:"com.mcleodgaming.elevator.Main",entryMode:"instance"});}})();
+    };if(typeof module !== 'undefined'){module.exports=AS3JS.load({program:Program,entry:"com.mcleodgaming.elevator.Main",entryMode:"instance"});}else if(typeof window!=='undefined'&&typeof AS3JS!=='undefined'){window['com.mcleodgaming.elevator.Main']=AS3JS.load({program:Program,entry:"com.mcleodgaming.elevator.Main",entryMode:"instance"});}})();
