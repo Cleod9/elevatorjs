@@ -22,7 +22,7 @@ var engine = new ElevatorEngine({
 engine.start();
 ```
 
-You can explore the source code to see how to initialize the individual Floors, People, and Elevators. But please note this project is mainly designed for demonstration purposes, so there is little configuration required.
+You can explore the source code to see how to initialize the individual Floors, People, and Elevators. But please note this project is mainly designed for demonstration purposes, so there is limited configuration.
 
 ## To Perform a Build ##
 
