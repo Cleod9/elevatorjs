@@ -1,5 +1,5 @@
 /*******************************
-  AS3JS Version 0.3.2
+  AS3JS Version 0.3.3
   
     AS3 to JS converter for use with ImportJS and OOPS.js.
   
@@ -100,12 +100,20 @@
         }
       }
 	
-      // Run inject() functions as the final step (this trivializes circular dependencies)
+      // Run inject() and $cinit() functions as the final step (this trivializes circular dependencies)
       for (i in packages) {
         // Execute the injection functions
         for (j in packages[i]) {
           if (typeof packages[i][j].module.inject === 'function') {
             packages[i][j].module.inject();
+          }
+        }
+      }
+      for (i in packages) {
+        // Execute the $cinit functions
+        for (j in packages[i]) {
+          if (typeof packages[i][j].module.exports.$cinit === 'function') {
+            packages[i][j].module.exports.$cinit();
           }
         }
       }
@@ -115,7 +123,7 @@
       var entryPoint = imports(entryPkgInfo.packageName, entryPkgInfo.className);
       if (params.entryMode === "instance") {
         return new entryPoint();
-      } else if (params.entryMode === "static" && typeof module !== 'undefined') {
+      } else if (params.entryMode === "static") {
         return entryPoint;
       }
     }
@@ -140,6 +148,13 @@
     };
     
     var Elevator = function(params) {
+          this.$init();      //Get settings and set defaults      params = params || {};      this.name = params.name || "[NoName]";      this.capacity = (params.capacity) ? params.capacity : 10;      this.state = params.state || ElevatorState.IDLE;      this.floors = params.floors || [];      this.targetFloors = params.targetFloors || [];      this.currentFloor = (this.floors.length > 0) ? params.currentFloor || this.floors[0] : null;      this.entranceFloor = (this.floors.length > 0) ? params.entranceFloor || this.floors[0] : null;      this.speedTimer = new FrameTimer(params.speedTimer || 30);      this.waitTimer = new FrameTimer(params.waitTimer || 60);      this.people = [];      this.targetFloorsMemory = [];    };
+    
+    
+    
+    
+    
+    Elevator.prototype.$init = function() {
           this.targetFloors = null;
           this.targetFloorsMemory = null;
           this.floors = null;
@@ -147,11 +162,7 @@
           this.entranceFloor = null;
           this.people = null;
           this.speedTimer = null;
-          this.waitTimer = null;      //Get settings and set defaults      params = params || {};      this.name = params.name || "[NoName]";      this.capacity = (params.capacity) ? params.capacity : 10;      this.state = params.state || ElevatorState.IDLE;      this.floors = params.floors || [];      this.targetFloors = params.targetFloors || [];      this.currentFloor = (this.floors.length > 0) ? params.currentFloor || this.floors[0] : null;      this.entranceFloor = (this.floors.length > 0) ? params.entranceFloor || this.floors[0] : null;      this.speedTimer = new FrameTimer(params.speedTimer || 30);      this.waitTimer = new FrameTimer(params.waitTimer || 60);      this.people = [];      this.targetFloorsMemory = [];    };
-    
-    
-    
-    
+          this.waitTimer = null;};
     Elevator.prototype.name = null;
     Elevator.prototype.state = 0;
     Elevator.prototype.targetFloors = null;
@@ -197,12 +208,8 @@
     };
     
     var ElevatorEngine = function(params) {
-          this.ticker = null;
-          this.elevators = null;
-          this.floors = null;
-          this.people = null;
-          this.queue = null;
-          this.entranceFloor = null;      //Get settings      params = params || {};      this.elevators = params.elevators || [];      this.floors = params.floors || [];      this.people = params.people || [];      this.entranceFloor = (params.entranceFloor) ? params.entranceFloor : (this.floors.length > 0) ? this.floors[0] : null;      this.queue = [];      Debug.log("An ElevatorEngine has been created. { elevators: " + this.elevators.length + ", floors: " + this.floors.length + ", people: " + this.people.length + " } ");    };
+          this.$init();      //Get settings      params = params || {};      this.elevators = params.elevators || [];      this.floors = params.floors || [];      this.people = params.people || [];      this.entranceFloor = (params.entranceFloor) ? params.entranceFloor : (this.floors.length > 0) ? this.floors[0] : null;      this.queue = [];      Debug.log("An ElevatorEngine has been created. { elevators: " + this.elevators.length + ", floors: " + this.floors.length + ", people: " + this.people.length + " } ");    };
+    
     
     
     
@@ -210,7 +217,17 @@
     ElevatorEngine.generateElevators = function(amount, floors, entranceFloor, currentFloor) {      //Generate given amount of elevators      var elevators = [];      for(var i = 0; i < amount; i++)        elevators.push(new Elevator({ name: "" + (i + 1), floors: floors, entranceFloor: entranceFloor, currentFloor: (currentFloor) ? currentFloor : null }));      return elevators;    };
     ElevatorEngine.generatePeople = function(amount, floors, entranceFloor, currentFloor) {      //Generate given amount of people      var people = [];      for(var i = 0; i < amount; i++) {        //Make a random floor        var targetFloor = floors[Math.round(Math.random()*(floors.length-1))];        while(targetFloor == currentFloor || targetFloor == entranceFloor)          targetFloor = floors[Math.round(Math.random()*(floors.length-1))];        var person = new Person({ name: RandomNameGenerator.getRandomName(), floorTimeMax: Math.round(Math.random()*(1000 - 250) + 250), entranceFloor: entranceFloor, currentFloor: (currentFloor) ? currentFloor : null, targetFloor: targetFloor });        people.push(person);        currentFloor.people.push(person);      }      return people;    };
     
+    ElevatorEngine.$cinit = function () {
     
+    };
+    
+    ElevatorEngine.prototype.$init = function() {
+          this.ticker = null;
+          this.elevators = null;
+          this.floors = null;
+          this.people = null;
+          this.queue = null;
+          this.entranceFloor = null;};
     ElevatorEngine.prototype.started = false;
     ElevatorEngine.prototype.ticker = null;
     ElevatorEngine.prototype.elevators = null;
@@ -236,16 +253,9 @@
     
     
     module.exports = ElevatorEngine;
-    };Program["com.mcleodgaming.elevator.core.ElevatorState"]=function(module, exports){  module.inject = function () {
-      ElevatorState.IDLE = 0;
-      ElevatorState.RISING = 1;
-      ElevatorState.FALLING = 2;
-      ElevatorState.WAITING = 3;
-      ElevatorState.RETURNING = 4;
-      ElevatorState.BROKEN = 5;
-    };
-    
+    };Program["com.mcleodgaming.elevator.core.ElevatorState"]=function(module, exports){  
     var ElevatorState = function ElevatorState() {};
+    
     
     
     ElevatorState.IDLE = 0;
@@ -256,16 +266,30 @@
     ElevatorState.BROKEN = 5;
     ElevatorState.asString = function(state) {      //For debugging purposes      return ["IDLE","RISING","FALLING","WAITING", "RETURNING", "BROKEN"][state];    };
     
+    ElevatorState.$cinit = function () {
+      ElevatorState.IDLE = 0;
+      ElevatorState.RISING = 1;
+      ElevatorState.FALLING = 2;
+      ElevatorState.WAITING = 3;
+      ElevatorState.RETURNING = 4;
+      ElevatorState.BROKEN = 5;
+    
+    };
+    
+    ElevatorState.prototype.$init = function() {}
     
     
     module.exports = ElevatorState;
     };Program["com.mcleodgaming.elevator.core.Floor"]=function(module, exports){  
     var Floor = function(params) {
-          this.people = null;      //Get settings      params = params || {};      this.index = (typeof params.index == "number") ? params.index : -1;      this.name = params.name || "[No Name]";      this.people = [];    };
+          this.$init();      //Get settings      params = params || {};      this.index = (typeof params.index == "number") ? params.index : -1;      this.name = params.name || "[No Name]";      this.people = [];    };
     
     
     
     
+    
+    Floor.prototype.$init = function() {
+          this.people = null;};
     Floor.prototype.index = 0;
     Floor.prototype.name = null;
     Floor.prototype.people = null;
@@ -283,15 +307,18 @@
     };
     
     var Person = function(params) {
+          this.$init();      //Get settings      params = params || {};      this.name = params.name || "Unknown";      this.entranceFloor = (params.entranceFloor) ? params.entranceFloor : null;      this.currentFloor = (params.currentFloor) ? params.currentFloor : null;      this.targetFloor = (params.targetFloor) ? params.targetFloor : null;      this.floorTimer = new FrameTimer(params.floorTimer || 1000);      this.state = params.state || PersonState.QUEUEING;      this.waitTimer = 0;    };
+    
+    
+    
+    
+    
+    Person.prototype.$init = function() {
           this.entranceFloor = null;
           this.currentFloor = null;
           this.targetFloor = null;
           this.currentElevator = null;
-          this.floorTimer = null;      //Get settings      params = params || {};      this.name = params.name || "Unknown";      this.entranceFloor = (params.entranceFloor) ? params.entranceFloor : null;      this.currentFloor = (params.currentFloor) ? params.currentFloor : null;      this.targetFloor = (params.targetFloor) ? params.targetFloor : null;      this.floorTimer = new FrameTimer(params.floorTimer || 1000);      this.state = params.state || PersonState.QUEUEING;      this.waitTimer = 0;    };
-    
-    
-    
-    
+          this.floorTimer = null;};
     Person.prototype.name = null;
     Person.prototype.state = 0;
     Person.prototype.entranceFloor = null;
@@ -309,15 +336,9 @@
     
     
     module.exports = Person;
-    };Program["com.mcleodgaming.elevator.core.PersonState"]=function(module, exports){  module.inject = function () {
-      PersonState.QUEUEING = 0;
-      PersonState.ENTERING = 1;
-      PersonState.IDLE = 2;
-      PersonState.LEAVING = 3;
-      PersonState.DONE = 4;
-    };
-    
+    };Program["com.mcleodgaming.elevator.core.PersonState"]=function(module, exports){  
     var PersonState = function PersonState() {};
+    
     
     
     PersonState.QUEUEING = 0;
@@ -326,35 +347,43 @@
     PersonState.LEAVING = 3;
     PersonState.DONE = 4;
     
+    PersonState.$cinit = function () {
+      PersonState.QUEUEING = 0;
+      PersonState.ENTERING = 1;
+      PersonState.IDLE = 2;
+      PersonState.LEAVING = 3;
+      PersonState.DONE = 4;
+    
+    };
+    
+    PersonState.prototype.$init = function() {}
     
     
     module.exports = PersonState;
     };  Program["com.mcleodgaming.elevator.events.ElevatorEngineEvent"]=function(module, exports){  var Event = module.import('com.mcleodgaming.elevator.events', 'Event');
-    module.inject = function () {
-      ElevatorEngineEvent.UPDATE = "elevatorEngineUpdate";
-    };
     
-    var ElevatorEngineEvent = function(type, data) {      Event.call(this, type, data);    };
+    var ElevatorEngineEvent = function(type, data) {
+          this.$init();      Event.call(this, type, data);    };
+    
     
     ElevatorEngineEvent.prototype = Object.create(Event.prototype);
     
     ElevatorEngineEvent.UPDATE = null;
     
+    ElevatorEngineEvent.$cinit = function () {
+      ElevatorEngineEvent.UPDATE = "elevatorEngineUpdate";
+    
+    };
+    
+    ElevatorEngineEvent.prototype.$init = function() {}
     
     
     module.exports = ElevatorEngineEvent;
     };Program["com.mcleodgaming.elevator.events.ElevatorEvent"]=function(module, exports){  var Event = module.import('com.mcleodgaming.elevator.events', 'Event');
-    module.inject = function () {
-      ElevatorEvent.ARRIVE = "elevatorArrive";
-      ElevatorEvent.DEPART = "elevatorDepart";
-      ElevatorEvent.RESPOND = "elevatorRespond";
-      ElevatorEvent.RELEASE = "elevatorRelease";
-      ElevatorEvent.NOPASSENGERS = "elevatorNoPassengers";
-      ElevatorEvent.OVERBURDENED = "elevatorOverburdened";
-      ElevatorEvent.FULL = "elevatorFull";
-    };
     
-    var ElevatorEvent = function(typeVal, dataVal) {      Event.call(this, typeVal, dataVal);    };
+    var ElevatorEvent = function(typeVal, dataVal) {
+          this.$init();      Event.call(this, typeVal, dataVal);    };
+    
     
     ElevatorEvent.prototype = Object.create(Event.prototype);
     
@@ -366,16 +395,31 @@
     ElevatorEvent.OVERBURDENED = null;
     ElevatorEvent.FULL = null;
     
+    ElevatorEvent.$cinit = function () {
+      ElevatorEvent.ARRIVE = "elevatorArrive";
+      ElevatorEvent.DEPART = "elevatorDepart";
+      ElevatorEvent.RESPOND = "elevatorRespond";
+      ElevatorEvent.RELEASE = "elevatorRelease";
+      ElevatorEvent.NOPASSENGERS = "elevatorNoPassengers";
+      ElevatorEvent.OVERBURDENED = "elevatorOverburdened";
+      ElevatorEvent.FULL = "elevatorFull";
+    
+    };
+    
+    ElevatorEvent.prototype.$init = function() {}
     
     
     module.exports = ElevatorEvent;
     };Program["com.mcleodgaming.elevator.events.Event"]=function(module, exports){  
     var Event = function(typeVal, dataVal) {
-          this.data = null;      this.type = typeVal || "event";      this.data = dataVal || {};    };
+          this.$init();      this.type = typeVal || "event";      this.data = dataVal || {};    };
     
     
     
     
+    
+    Event.prototype.$init = function() {
+          this.data = null;};
     Event.prototype.type = null;
     Event.prototype.data = null
     
@@ -384,12 +428,11 @@
     };Program["com.mcleodgaming.elevator.events.EventDispatcher"]=function(module, exports){  var Debug;
     module.inject = function () {
       Debug = module.import('com.mcleodgaming.elevator.util', 'Debug');
-      EventDispatcher.debug = false;
-      EventDispatcher.dispatcher = null;
     };
     
     var EventDispatcher = function() {
-          this._eventList = null;      this._eventList = {};    };
+          this.$init();      this._eventList = {};    };
+    
     
     
     
@@ -397,7 +440,14 @@
     EventDispatcher.dispatcher = null;
     EventDispatcher.init = function() {      EventDispatcher.dispatcher = new EventDispatcher();    };
     
+    EventDispatcher.$cinit = function () {
+      EventDispatcher.debug = false;
+      EventDispatcher.dispatcher = null;
     
+    };
+    
+    EventDispatcher.prototype.$init = function() {
+          this._eventList = null;};
     EventDispatcher.prototype._eventList = null;
     EventDispatcher.prototype.addEventListener = function(type, listener) {      if(typeof listener != 'function')        throw new Error("[EventDispatcher] Error, provided event listener is not a function");      //Save the event under its name in our eventList Dictionary      if(!this._eventList[type])        this._eventList[type] = [];      this._eventList[type].push({ listener: listener});    };
     EventDispatcher.prototype.removeEventListener = function(type, listener) {
@@ -412,16 +462,10 @@
     
     module.exports = EventDispatcher;
     };Program["com.mcleodgaming.elevator.events.PersonEvent"]=function(module, exports){  var Event = module.import('com.mcleodgaming.elevator.events', 'Event');
-    module.inject = function () {
-      PersonEvent.ENTERING = "personEntering";
-      PersonEvent.BOARDED = "personBoarded";
-      PersonEvent.WAITING = "personWaiting";
-      PersonEvent.LEAVING = "personLeaving";
-      PersonEvent.DEPARTED = "personDeparted";
-      PersonEvent.DONE = "personDone";
-    };
     
-    var PersonEvent = function(typeVal, dataVal) {      Event.call(this, typeVal, dataVal);    };
+    var PersonEvent = function(typeVal, dataVal) {
+          this.$init();      Event.call(this, typeVal, dataVal);    };
+    
     
     PersonEvent.prototype = Object.create(Event.prototype);
     
@@ -432,6 +476,17 @@
     PersonEvent.DEPARTED = null;
     PersonEvent.DONE = null;
     
+    PersonEvent.$cinit = function () {
+      PersonEvent.ENTERING = "personEntering";
+      PersonEvent.BOARDED = "personBoarded";
+      PersonEvent.WAITING = "personWaiting";
+      PersonEvent.LEAVING = "personLeaving";
+      PersonEvent.DEPARTED = "personDeparted";
+      PersonEvent.DONE = "personDone";
+    
+    };
+    
+    PersonEvent.prototype.$init = function() {}
     
     
     module.exports = PersonEvent;
@@ -441,14 +496,10 @@
       EventDispatcher = module.import('com.mcleodgaming.elevator.events', 'EventDispatcher');
       Debug = module.import('com.mcleodgaming.elevator.util', 'Debug');
       ElevatorViewJS = module.import('com.mcleodgaming.elevator.views', 'ElevatorViewJS');
-      Main.ROOT = null;
-      Main.FPS = 30;
     };
     
     var Main = function() {
-          this.engine = null;
-          this.view = null;
-          this.addPeopleInterval = null;
+          this.$init();
           Debug.init();
           Debug.log("Main class created.");
     
@@ -483,6 +534,7 @@
     
     
     
+    
     Main.ROOT = null;
     Main.FPS = 30;
     Main.eventHelper = function(context, fn) {
@@ -492,7 +544,16 @@
           };
         };
     
+    Main.$cinit = function () {
+      Main.ROOT = null;
+      Main.FPS = 30;
     
+    };
+    
+    Main.prototype.$init = function() {
+          this.engine = null;
+          this.view = null;
+          this.addPeopleInterval = null;};
     Main.prototype.engine = null;
     Main.prototype.view = null;
     Main.prototype.addingPeople = false;
@@ -530,11 +591,10 @@
     };  Program["com.mcleodgaming.elevator.util.Debug"]=function(module, exports){  var DebugJS;
     module.inject = function () {
       DebugJS = module.import('com.mcleodgaming.elevator.util', 'DebugJS');
-      Debug.log = null;
-      Debug.warn = null;
     };
     
     var Debug = function Debug() {};
+    
     
     
     Debug.log = null;
@@ -546,6 +606,13 @@
           Debug.warn = DebugJS.warn;
         };
     
+    Debug.$cinit = function () {
+      Debug.log = null;
+      Debug.warn = null;
+    
+    };
+    
+    Debug.prototype.$init = function() {}
     
     
     module.exports = Debug;
@@ -553,11 +620,17 @@
     var DebugAS3 = function DebugAS3() {};
     
     
+    
     DebugAS3.log = function() {
           var rest = Array.prototype.slice.call(arguments).splice(0);      trace.apply(null, rest);    };
     DebugAS3.warn = function() {
           var rest = Array.prototype.slice.call(arguments).splice(0);      trace.apply(null, rest);    };
     
+    DebugAS3.$cinit = function () {
+    
+    };
+    
+    DebugAS3.prototype.$init = function() {}
     
     
     module.exports = DebugAS3;
@@ -565,14 +638,22 @@
     var DebugJS = function DebugJS() {};
     
     
+    
     DebugJS.log = function() {      console.log.apply(console, arguments);    };
     DebugJS.warn = function() {      console.warn(console, arguments);    };
     
+    DebugJS.$cinit = function () {
+    
+    };
+    
+    DebugJS.prototype.$init = function() {}
     
     
     module.exports = DebugJS;
     };Program["com.mcleodgaming.elevator.util.FrameTimer"]=function(module, exports){  
-    var FrameTimer = function(length) {      this.m_initTime = length;      this.m_currentTime = 0;    };
+    var FrameTimer = function(length) {
+          this.$init();      this.m_initTime = length;      this.m_currentTime = 0;    };
+    
     
     
     
@@ -582,6 +663,7 @@
     FrameTimer.prototype.get_CurrentTime = function() {      return this.m_currentTime;    };
     FrameTimer.prototype.set_MaxTime = function(value) {      if (value < 0)      {        this.m_initTime = 0;      } else      {        this.m_initTime = value;        if (this.m_currentTime > this.m_initTime)        {          this.m_currentTime = this.m_initTime;        }      }    };
     FrameTimer.prototype.set_CurrentTime = function(value) {      if (value < 0)      {        this.m_currentTime = 0;      } else      {        this.m_currentTime = (value > this.get_MaxTime()) ? this.get_MaxTime() : value;      }    };
+    FrameTimer.prototype.$init = function() {};
     FrameTimer.prototype.m_initTime = 0;
     FrameTimer.prototype.m_currentTime = 0;
     FrameTimer.prototype.tick = function(amount) {
@@ -591,16 +673,20 @@
     
     
     module.exports = FrameTimer;
-    };Program["com.mcleodgaming.elevator.util.RandomNameGenerator"]=function(module, exports){  module.inject = function () {
-      RandomNameGenerator.names = ["Derek","Reginald","Hubert","Woodrow","Norma","Cheryl","Allison","Jamie","Bessie","Corey","Emily","Jeremiah","Lana","Rosemary","Willie","Alfred","Rex","Tomas","Carol","Bernard","Dean","Jan","Salvador","Antonio","John","Spencer","Bill","Angel","Clarence","Bethany","Joan","Jenna","Loretta","Marie","Jonathan","Kristi","Dolores","Eloise","Latoya","Krista","Earnest","Eduardo","Darin","Francis","Pauline","Arturo","Preston","Rosie","Sandra","Denise","Kari","Amanda","James","Darla","Alexis","Leon","Penny","Roland","Mark","Evan","Amos","Jennie","Susie","Peter","Johanna","Frederick","Christopher","Kerry","Taylor","Luz","Laverne","Greg","Marcus","Luke","Toby","Olivia","Patsy","Paula","Alex","Ernest","Myrtle","Ernesto","Eleanor","Nicole","Ivan","Claudia","Ray","Byron","Grace","Jenny","Glenda","Pablo","Maryann","Perry","Susan","Virginia","Jan","Ellen","Elsie","Hugh"];
-    };
-    
+    };Program["com.mcleodgaming.elevator.util.RandomNameGenerator"]=function(module, exports){  
     var RandomNameGenerator = function RandomNameGenerator() {};
+    
     
     
     RandomNameGenerator.names = null;
     RandomNameGenerator.getRandomName = function() {      return RandomNameGenerator.names[Math.round(Math.random() * (RandomNameGenerator.names.length-1))];    };
     
+    RandomNameGenerator.$cinit = function () {
+      RandomNameGenerator.names = ["Derek","Reginald","Hubert","Woodrow","Norma","Cheryl","Allison","Jamie","Bessie","Corey","Emily","Jeremiah","Lana","Rosemary","Willie","Alfred","Rex","Tomas","Carol","Bernard","Dean","Jan","Salvador","Antonio","John","Spencer","Bill","Angel","Clarence","Bethany","Joan","Jenna","Loretta","Marie","Jonathan","Kristi","Dolores","Eloise","Latoya","Krista","Earnest","Eduardo","Darin","Francis","Pauline","Arturo","Preston","Rosie","Sandra","Denise","Kari","Amanda","James","Darla","Alexis","Leon","Penny","Roland","Mark","Evan","Amos","Jennie","Susie","Peter","Johanna","Frederick","Christopher","Kerry","Taylor","Luz","Laverne","Greg","Marcus","Luke","Toby","Olivia","Patsy","Paula","Alex","Ernest","Myrtle","Ernesto","Eleanor","Nicole","Ivan","Claudia","Ray","Byron","Grace","Jenny","Glenda","Pablo","Maryann","Perry","Susan","Virginia","Jan","Ellen","Elsie","Hugh"];
+    
+    };
+    
+    RandomNameGenerator.prototype.$init = function() {}
     
     
     module.exports = RandomNameGenerator;
@@ -610,13 +696,16 @@
     };
     
     var ElevatorView = function(e) {
-          this.engine = null;
+          this.$init();
           this.engine = e;
         };
     
     
     
     
+    
+    ElevatorView.prototype.$init = function() {
+          this.engine = null;};
     ElevatorView.prototype.engine = null;
     ElevatorView.prototype.onUpdate = function(event) {
         };
@@ -646,15 +735,18 @@
     };
     
     var ElevatorViewAS3 = function(e) {
-          this.elevatorContainer = null;
-          this.elevatorMCs = null;
-          this.pauseButton = null;
-          this.floorTable = null;
-          this.floorMCs = null;      ElevatorView.call(this, e);      var self = this;      var i, mc, txtField;      //Create display elements      this.elevatorContainer = new MovieClip();      this.elevatorContainer.graphics.beginFill(0xffffff);      this.elevatorContainer.graphics.lineStyle(1, 0x000000);      this.elevatorContainer.graphics.drawRect(0, 0, Main.ROOT.stage.width, Main.ROOT.stage.height);      this.elevatorContainer.graphics.endFill();      this.elevatorMCs = [];      for(i = 0; i < this.engine.elevators.length; i++) {        mc = new MovieClip(); //New elevator MC        mc.x = 100 * i + 100;        mc.y = 300;        mc.graphics.beginFill(0xffffff);        mc.graphics.lineStyle(1, 0x000000);        mc.graphics.drawRect(0, 0, 100, 150);        mc.graphics.endFill();        txtField = new TextField(); //Text field        txtField.width = 100;        txtField.height = 150;        txtField.name = "txt";        mc.addChild(txtField); //Add text field to elevator MC        this.elevatorMCs.push(mc); //Add elevator MC to list        this.elevatorContainer.addChild(mc); //Add to main container      }      //Build floor table      this.floorTable = new MovieClip();      this.floorMCs = [];      for(i = 0; i < this.engine.floors.length; i++) {        mc = new MovieClip(); //New elevator MC        mc.y = 45 * i;        mc.graphics.beginFill(0xffffff);        mc.graphics.lineStyle(1, 0x000000);        mc.graphics.drawRect(0, 0, 100, 45);        mc.graphics.endFill();        txtField = new TextField();        txtField.width = 100;        txtField.height = 45;        txtField.multiline = true;        txtField.wordWrap = true;        txtField.name = "txt";        mc.addChild(txtField);        this.floorTable.addChild(mc);        this.floorMCs.push(mc);      }      //Make pause button to start/stop the engine and people adding timer      this.pauseButton = new MovieClip();      this.pauseButton.ispaused = false;      this.pauseButton.x = 600;      this.pauseButton.graphics.beginFill(0xffffff);      this.pauseButton.graphics.lineStyle(1, 0xffffff);      this.pauseButton.graphics.drawRect(0, 0, 100, 45);      this.pauseButton.graphics.endFill();      this.pauseButton.useHandCursor = true;      this.pauseButton.mouseChildren = false;      this.pauseButton.buttonMode = true;      txtField = new TextField();      txtField.width = 200;      txtField.height = 300;      txtField.selectable = false;      txtField.name = "txt";      txtField.text = "Pause";      txtField.mouseEnabled = false;      this.pauseButton.addEventListener(MouseEvent.CLICK, function(e) {        this.pauseButton.ispaused = !this.pauseButton.ispaused;        if(this.pauseButton.ispaused) {          TextField(this.pauseButton.getChildByName('txt')).text = "Play";          Main.ROOT.stopAddingPeople();          self.engine.stop();        } else {          TextField(this.pauseButton.getChildByName('txt')).text = "Pause";          self.engine.start();          Main.ROOT.startAddingPeople();        }      });      this.pauseButton.addChild(txtField);      //Add to ROOT      Main.ROOT.addChild(this.elevatorContainer);      Main.ROOT.addChild(this.floorTable);      Main.ROOT.addChild(this.pauseButton);      //Ready to accept events      EventDispatcher.dispatcher.addEventListener(ElevatorEngineEvent.UPDATE, this.onUpdate);      trace('Initialized ElevatorView');    };
+          this.$init();      ElevatorView.call(this, e);      var self = this;      var i, mc, txtField;      //Create display elements      this.elevatorContainer = new MovieClip();      this.elevatorContainer.graphics.beginFill(0xffffff);      this.elevatorContainer.graphics.lineStyle(1, 0x000000);      this.elevatorContainer.graphics.drawRect(0, 0, Main.ROOT.stage.width, Main.ROOT.stage.height);      this.elevatorContainer.graphics.endFill();      this.elevatorMCs = [];      for(i = 0; i < this.engine.elevators.length; i++) {        mc = new MovieClip(); //New elevator MC        mc.x = 100 * i + 100;        mc.y = 300;        mc.graphics.beginFill(0xffffff);        mc.graphics.lineStyle(1, 0x000000);        mc.graphics.drawRect(0, 0, 100, 150);        mc.graphics.endFill();        txtField = new TextField(); //Text field        txtField.width = 100;        txtField.height = 150;        txtField.name = "txt";        mc.addChild(txtField); //Add text field to elevator MC        this.elevatorMCs.push(mc); //Add elevator MC to list        this.elevatorContainer.addChild(mc); //Add to main container      }      //Build floor table      this.floorTable = new MovieClip();      this.floorMCs = [];      for(i = 0; i < this.engine.floors.length; i++) {        mc = new MovieClip(); //New elevator MC        mc.y = 45 * i;        mc.graphics.beginFill(0xffffff);        mc.graphics.lineStyle(1, 0x000000);        mc.graphics.drawRect(0, 0, 100, 45);        mc.graphics.endFill();        txtField = new TextField();        txtField.width = 100;        txtField.height = 45;        txtField.multiline = true;        txtField.wordWrap = true;        txtField.name = "txt";        mc.addChild(txtField);        this.floorTable.addChild(mc);        this.floorMCs.push(mc);      }      //Make pause button to start/stop the engine and people adding timer      this.pauseButton = new MovieClip();      this.pauseButton.ispaused = false;      this.pauseButton.x = 600;      this.pauseButton.graphics.beginFill(0xffffff);      this.pauseButton.graphics.lineStyle(1, 0xffffff);      this.pauseButton.graphics.drawRect(0, 0, 100, 45);      this.pauseButton.graphics.endFill();      this.pauseButton.useHandCursor = true;      this.pauseButton.mouseChildren = false;      this.pauseButton.buttonMode = true;      txtField = new TextField();      txtField.width = 200;      txtField.height = 300;      txtField.selectable = false;      txtField.name = "txt";      txtField.text = "Pause";      txtField.mouseEnabled = false;      this.pauseButton.addEventListener(MouseEvent.CLICK, function(e) {        this.pauseButton.ispaused = !this.pauseButton.ispaused;        if(this.pauseButton.ispaused) {          TextField(this.pauseButton.getChildByName('txt')).text = "Play";          Main.ROOT.stopAddingPeople();          self.engine.stop();        } else {          TextField(this.pauseButton.getChildByName('txt')).text = "Pause";          self.engine.start();          Main.ROOT.startAddingPeople();        }      });      this.pauseButton.addChild(txtField);      //Add to ROOT      Main.ROOT.addChild(this.elevatorContainer);      Main.ROOT.addChild(this.floorTable);      Main.ROOT.addChild(this.pauseButton);      //Ready to accept events      EventDispatcher.dispatcher.addEventListener(ElevatorEngineEvent.UPDATE, this.onUpdate);      trace('Initialized ElevatorView');    };
+    
     
     ElevatorViewAS3.prototype = Object.create(ElevatorView.prototype);
     
     
+    ElevatorViewAS3.prototype.$init = function() {
+          this.elevatorContainer = null;
+          this.elevatorMCs = null;
+          this.pauseButton = null;
+          this.floorTable = null;
+          this.floorMCs = null;};
     ElevatorViewAS3.prototype.elevatorContainer = null;
     ElevatorViewAS3.prototype.elevatorMCs = null;
     ElevatorViewAS3.prototype.pauseButton = null;
@@ -676,10 +768,7 @@
     };
     
     var ElevatorViewJS = function(e) {
-          this.elevatorTable = null;
-          this.elevatorRow = null;
-          this.elevatorColumns = null;
-          this.floorTable = null;
+          this.$init();
           ElevatorView.call(this, e);
           var i;
           var self = this;
@@ -727,9 +816,15 @@
           Debug.log('Initialized ElevatorView');
         };
     
+    
     ElevatorViewJS.prototype = Object.create(ElevatorView.prototype);
     
     
+    ElevatorViewJS.prototype.$init = function() {
+          this.elevatorTable = null;
+          this.elevatorRow = null;
+          this.elevatorColumns = null;
+          this.floorTable = null;};
     ElevatorViewJS.prototype.pauseToggle = false;
     ElevatorViewJS.prototype.elevatorTable = null;
     ElevatorViewJS.prototype.elevatorRow = null;
