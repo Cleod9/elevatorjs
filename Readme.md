@@ -4,7 +4,7 @@
 
 This is a sample application that was built with [AS3JS](https://github.com/Cleod9/as3js). It's an engine for an elevator simulator built with ActionScript 3.0 source code that executes in HTML5 without the Flash Player. For kicks I've included a Flash SWF just to demonstrate how easy it is to port. If you want to compile the Flash version yourself via the Flash IDE, you can grep the .as files for the text "For AS3" to find the code lines you'll need to modify.
 
-[See Live Demo Here](http://as3js.org/examples/elevator)
+[See Live Demo Here](https://jsfiddle.net/cleod9/qh79eknf/3/embedded/result)
 
 ## Initialization ##
 
